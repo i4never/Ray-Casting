@@ -143,28 +143,33 @@ int main()
     imshow( "Display window", data_field.data[0]->image);                   // Show our image inside it.
     
     int current = 0;
+    char in;
     while (1)
     {
-        char c = waitKey(0);
-        if (c != -1)
+        in = waitKey(0);
+        if (in != -1)
             cout<<c<<endl;
-        if (c == 'q')
-            return 0;
-        if (c == 'f')
+        if (in == 'q')
+            break;
+        if (in == 'f')
         {
-            cout<<"F"<<endl;
-            current = (current+1)/data_field.num;
+            current = (current+1)%data_field.num;
+            cout<<"f    "<<current<<endl;
             namedWindow( "Display window", WINDOW_AUTOSIZE );
             imshow( "Display window", data_field.data[current]->image);                   // Show our image inside it.
         }
-        if (c == 'b')
+        if (in == 'b')
         {
-            cout<<"b"<<endl;
-            current = (current-1)/data_field.num;
+            current = (current-1)%data_field.num;
+            cout<<"b    "<<current<<endl;
             namedWindow( "Display window", WINDOW_AUTOSIZE );
             imshow( "Display window", data_field.data[current]->image);                   // Show our image inside it.
         }
     }
+    
+    namedWindow( "Display window", WINDOW_AUTOSIZE );
+    imshow( "Display window", data_field.data[100]->image);
+    waitKey(0);
     
     return 0;
 }
