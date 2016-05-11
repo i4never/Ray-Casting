@@ -5,6 +5,7 @@ class DataField
 public:
     Slice ** slices;
     int num;
+    double pixel_space;
 public:
     DataField ();           //init
     ~DataField();           //destory

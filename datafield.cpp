@@ -11,6 +11,7 @@ DataField::DataField()
 {
     slices = NULL;
     num = 0;
+    pixel_space = 0;
 }
 
 DataField::~DataField()
@@ -35,7 +36,7 @@ bool DataField::Load(const char * path)
     int r,c;
     for (int i = 0 ; i < num ; i++)
     {
-        cout<<"Loading picture "<<i+1<<" ..."<<endl;
+        cout<<"Loading picture "<<i+1<<" ...";
         slices[i] = new Slice;
         slices[i]->mat = new Matrix;
         fscanf(fp,"%d   %d", &r, &c);
@@ -45,10 +46,12 @@ bool DataField::Load(const char * path)
         slices[i]->mat->Init(r,c);
         for (int j = 0 ; j < r ; j++)
             for (int k = 0 ; k < c ; k++)
-                fscanf(fp,"%d",&(slices[i]->mat->elmt[j][k]));
+                fscanf(fp,"%lf",&(slices[i]->mat->elmt[j][k]));
+        cout<<"height:"<<r<<"   width:"<<c<<"   coordinate:"<<slices[i]->coordinate[0]<<"   "<<slices[i]->coordinate[1]<<"   "<<slices[i]->coordinate[2]<<"   "<<endl;
         slices[i]->Matrix2Image();
     }
-    cout<<"Finish loading "<<num<<" pictures."<<endl;
+    fscanf(fp,"%lf", &pixel_space);
+    cout<<"Finish loading "<<num<<" pictures, pixel spacing is "<<pixel_space<<"."<<endl;
     return true;
 }
 
