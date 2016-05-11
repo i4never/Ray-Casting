@@ -15,5 +15,6 @@ public:
 	Matrix operator*(Matrix multi);         //reload *
     Matrix operator*(ELEMENT_TYPE t);       //reload *
     Matrix operator-(Matrix t);       //reload -
+    Matrix operator+(Matrix t);       //reload +
 
 };
