@@ -72,6 +72,24 @@ Matrix Matrix::operator*(Matrix multi)
 	return result;
 }
 
+Matrix Matrix::operator-(Matrix t)
+{
+    if (this->r != t.r || this->c != t.c)
+    {
+        cout<<"ERROR: The following matrixs can't be minused."<<endl;
+        this->Show();
+        t.Show();
+        exit(-1);
+    }
+    
+    Matrix result;
+    result.Init(this->r,this->c);
+    for (int i = 0 ; i < this->r ; i++)
+        for (int j = 0 ; j < this->c ; j++)
+            result.elmt[i][j] = this->elmt[i][j] - t.elmt[i][j];
+    return result;
+}
+
 Matrix Matrix::operator*(ELEMENT_TYPE t)
 {
     Matrix result;

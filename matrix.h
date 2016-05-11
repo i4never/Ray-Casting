@@ -13,5 +13,7 @@ public:
 	void Reset();                           //clean the matrix
 	void Show();                            //pirnt matrix
 	Matrix operator*(Matrix multi);         //reload *
-    Matrix operator*(ELEMENT_TYPE t);         //reload *
+    Matrix operator*(ELEMENT_TYPE t);       //reload *
+    Matrix operator-(Matrix t);       //reload -
+
 };
