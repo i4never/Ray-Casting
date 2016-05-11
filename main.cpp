@@ -1,4 +1,5 @@
 #include "datafield.h"
+#include <cmath>
 #include <stdlib.h>
 #include <stdio.h>
 #include <iostream>
@@ -9,9 +10,15 @@
 using namespace std;
 using namespace cv;
 
+
 const double EPS = 1e-10;
 const double PI = 3.1415926535897932384626;
+
+#define ZERO(a) if (abs(a)<EPS) a = 0;
+
 DataField data_field;
+
+
 
 //change int to string
 char * itoa(int num)
@@ -65,11 +72,15 @@ Matrix get_rotate(double ang_x, double ang_y, double ang_z)
 	return R;
 }
 
-//Key function
-Matrix RayCast(double ang_x, double ang_y, double ang_z, int res_height, int res_width, double distance)
+//Key function (the angle are using 0~2pi, all the length is mm)
+Matrix RayCast(double ang_x, double ang_y, double ang_z, double res_height, double res_width, double distance)
 {
+    //result image data
+    int res_height_pixel = int(res_height/data_field.pixel_space+1);
+    int res_width_pixel = int(res_width/data_field.pixel_space+1);
+    cout<<res_height_pixel<<" "<<res_width_pixel<<endl;
     Matrix result;
-    result.Init(res_height,res_width);
+    result.Init(res_height_pixel,res_width_pixel);
 
     Matrix u0,v0,g0;
     //rotate matrix
@@ -95,12 +106,44 @@ Matrix RayCast(double ang_x, double ang_y, double ang_z, int res_height, int res
     Matrix v = v0*mat_rotate;
     Matrix g = g0*mat_rotate;
     
-    //middle coordinate of project image
+    //center location of the project image
+    Matrix s;
+    s = g*distance;
+    ZERO(s.elmt[0][0]);
+    ZERO(s.elmt[0][1]);
+    ZERO(s.elmt[0][2]);
+    s.Show();
+    
+    //lower left location of the project image
     Matrix e;
-    e.Init(1,3);
+    e = s-v*(res_height/2)-u*(res_width/2);
+    e.Show();
     
+    Matrix coor;
+    coor.Init(1,3);
+    //calculate each pixel
+    for (int i = 0 ; i < res_height_pixel ; i++)
+    {
+        for (int j = 0 ; j < res_width_pixel ; j++)
+        {
+            //calculate the coordinate of this pixel
+//            coor.elmt[0] = e.elmt[0]+i*pixel_space*v[0]+j*pixel_space*u[0];
+            coor = e+v*(i*data_field.pixel_space)+u*(j*data_field.pixel_space);
+            if (coor.elmt[0][0]*coor.elmt[0][1]<0)
+                result.elmt[i][j] = 255;
+            else
+                result.elmt[i][j] =0;
+        }
+    }
+    coor.Show();
     
+    namedWindow( "Display window", WINDOW_AUTOSIZE );
     
+    Slice res;
+    res.mat = &result;
+    imshow( "Display window", res.Matrix2Image());
+    
+    waitKey(0);
     
     return result;
 }
@@ -113,43 +156,8 @@ int main()
     
     
     data_field.Load("./data");
-    
-    
-    namedWindow( "Display window", WINDOW_AUTOSIZE );
-    
-    int current = 0;
-    imshow( "Display window", data_field.slices[current]->image);
-    char in;
-    while (1)
-    {
-        if (in == 'a')
-            data_field.Adjust();
-        in = waitKey(0);
-        if (in != -1)
-            cout<<in<<endl;
-            if (in == 'q')
-            break;
-        if (in == 'f')
-        {
-            current = (current+1)%data_field.num;
-            cout<<data_field.slices[current]->coordinate[0]<<"  "<<data_field.slices[current]->coordinate[1]<<"  "<<data_field.slices[current]->coordinate[2]<<"  "<<endl;
-            namedWindow( "Display window", WINDOW_AUTOSIZE );
-            imshow( "Display window", data_field.slices[current]->image);                   // Show our image inside it.
-        }
-            if (in == 'b')
-        {
-            current = (current-1)%data_field.num;
-            cout<<"b    "<<current<<endl;
-            namedWindow( "Display window", WINDOW_AUTOSIZE );
-            imshow( "Display window", data_field.slices[current]->image);                   // Show our image inside it.
-        }
-            }
-    
-    
-    
-    //Init veison direction
-    
-//    RayCast(0,rate(180),0,1500,512,300);
+
+    RayCast(0,0,0,1400,400,-300);
     
     return 0;
 }
