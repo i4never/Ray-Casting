@@ -32,13 +32,3 @@ public:
 	Linear_Inter();				//init
 	int Calculate();			//calculate
 };
-
-class DataField
-{
-public:
-    Matrix ** data;
-    int num;
-public:
-    DataField ();           //init
-    ~DataField();           //destory
-};

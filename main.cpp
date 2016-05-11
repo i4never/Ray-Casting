@@ -1,5 +1,6 @@
 #include "global.h"
 #include "matrix.h"
+#include "datafield.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <fstream>
@@ -14,25 +15,6 @@ using namespace cv;
 const double EPS = 1e-10;
 const double PI = 3.1415926535897932384626;
 DataField data_field;
-
-
-/******************************/
-//class DataField
-DataField::DataField()
-{
-    data = NULL;
-    num = 0;
-}
-
-DataField::~DataField()
-{
-    if (data != NULL)
-    {
-        for (int i = 0 ; i < num ; i++)
-            ;
-        delete data;
-    }
-}
 
 //change int to string
 char * itoa(int num)
@@ -106,70 +88,35 @@ int main()
 	}
 */
     
-    FILE *fp = fopen("./data","r");
+    data_field.Load("./data");
     
-    //read file to get gray data
-    fscanf(fp,"%d", &data_field.num);
-    cout<<data_field.num<<endl;
-    data_field.data = new Matrix*[data_field.num];
-    
-    cout<<"Start loading "<<data_field.num<<" pictures."<<endl;
-    int r,c;
-    for (int i = 0 ; i < data_field.num ; i++)
-//        for (int i = 0 ; i < 1 ; i++)
-    {
-        cout<<"Loading picture "<<i+1<<" ..."<<endl;
-        data_field.data[i] = new Matrix;
-        fscanf(fp,"%d   %d", &r, &c);
-        data_field.data[i]->Init(r,c);
-        for (int j = 0 ; j < r ; j++)
-            for (int k = 0 ; k < c ; k++)
-                fscanf(fp,"%d",&(data_field.data[i]->elmt[j][k]));
-        imshow( "Display window",data_field.data[i]->Matrix2Image());
-//        data_field.data[i]->Show();
-    }
-    cout<<"Finish loading "<<data_field.num<<" pictures."<<endl;
-
-//    int r,c;
-//    Matrix temp;
-//    fscanf(fp,"%d   %d", &r, &c);
-//    temp.Init(r,c);
-//    for (int i  = 0 ; i < r ; i++)
-//        for (int j = 0 ; j < c ; j++)
-//            fscanf(fp,"%d",&temp.elmt[i][j]);
-//    temp.Show();
-    
-    namedWindow( "Display window", WINDOW_AUTOSIZE );
-    imshow( "Display window", data_field.data[0]->image);                   // Show our image inside it.
-    
-    int current = 0;
-    char in;
-    while (1)
-    {
-        in = waitKey(0);
-        if (in != -1)
-            cout<<c<<endl;
-        if (in == 'q')
-            break;
-        if (in == 'f')
-        {
-            current = (current+1)%data_field.num;
-            cout<<"f    "<<current<<endl;
-            namedWindow( "Display window", WINDOW_AUTOSIZE );
-            imshow( "Display window", data_field.data[current]->image);                   // Show our image inside it.
-        }
-        if (in == 'b')
-        {
-            current = (current-1)%data_field.num;
-            cout<<"b    "<<current<<endl;
-            namedWindow( "Display window", WINDOW_AUTOSIZE );
-            imshow( "Display window", data_field.data[current]->image);                   // Show our image inside it.
-        }
-    }
-    
-    namedWindow( "Display window", WINDOW_AUTOSIZE );
-    imshow( "Display window", data_field.data[100]->image);
-    waitKey(0);
-    
+//    
+//    namedWindow( "Display window", WINDOW_AUTOSIZE );
+//    
+//    int current = 0;
+//    imshow( "Display window", data_field.data[current]->image);
+//    char in;
+//    while (1)
+//    {
+//        in = waitKey(0);
+//        if (in != -1)
+//            cout<<in<<endl;
+//        if (in == 'q')
+//            break;
+//        if (in == 'f')
+//        {
+//            current = (current+1)%data_field.num;
+//            cout<<"f    "<<current<<endl;
+//            namedWindow( "Display window", WINDOW_AUTOSIZE );
+//            imshow( "Display window", data_field.data[current]->image);                   // Show our image inside it.
+//        }
+//        if (in == 'b')
+//        {
+//            current = (current-1)%data_field.num;
+//            cout<<"b    "<<current<<endl;
+//            namedWindow( "Display window", WINDOW_AUTOSIZE );
+//            imshow( "Display window", data_field.data[current]->image);                   // Show our image inside it.
+//        }
+//    }
     return 0;
 }

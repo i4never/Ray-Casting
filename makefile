@@ -1,9 +1,12 @@
 CC=g++
 
-all:	touch matrix interpolation coordinate main
-	$(CC) matrix.o main.o interpolation.o coordinate.o -L/usr/local/lib -lopencv_core.3.0.0 -lopencv_highgui.3.0.0 -lopencv_imgproc.3.0.0 -lopencv_imgcodecs.3.0.0 -o main.out
+all:	touch matrix datafield interpolation coordinate main
+	$(CC) matrix.o main.o datafield.o interpolation.o coordinate.o -L/usr/local/lib -lopencv_core.3.0.0 -lopencv_highgui.3.0.0 -lopencv_imgproc.3.0.0 -lopencv_imgcodecs.3.0.0 -o main.out
 	rm -rf *.o
 	./main.out
+
+datafield:
+	$(CC) -c datafield.cpp -I/usr/local/include
 
 touch:
 	touch *
