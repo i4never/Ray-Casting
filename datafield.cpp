@@ -51,3 +51,12 @@ bool DataField::Load(const char * path)
     cout<<"Finish loading "<<num<<" pictures."<<endl;
     return true;
 }
+
+bool DataField::Adjust()
+{
+    int middle_index = num/2;
+    double offset = slices[middle_index]->coordinate[2];
+    for (int i = 0 ; i < num ; i ++)
+        slices[i]->coordinate[2] -= offset;
+    return true;
+}
