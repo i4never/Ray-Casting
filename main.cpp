@@ -1,9 +1,6 @@
-#include "global.h"
-#include "matrix.h"
 #include "datafield.h"
 #include <stdlib.h>
 #include <stdio.h>
-#include <fstream>
 #include <iostream>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
@@ -68,55 +65,63 @@ Matrix get_rotate(double ang_x, double ang_y, double ang_z)
 	return R;
 }
 
+//Key function
+Matrix RayCast(double ang_x, double ang_y, double ang_z, int res_height, int res_width, double distance)
+{
+    Matrix result;
+    result.Init(res_height,res_width);
+
+    Matrix u0,v0,g0;
+    //rotate matrix
+    Matrix mat_rotate = get_rotate(ang_x, ang_y, ang_z);
+    //init horizon direction
+    u0.Init(1,3);
+    u0.elmt[0][0] = 1;
+    u0.elmt[0][1] = 0;
+    u0.elmt[0][2] = 0;
+    //init vertical direction
+    v0.Init(1,3);
+    v0.elmt[0][0] = 0;
+    v0.elmt[0][1] = 1;
+    v0.elmt[0][2] = 0;
+    //init view direction
+    g0.Init(1,3);
+    g0.elmt[0][0] = 0;
+    g0.elmt[0][1] = 0;
+    g0.elmt[0][2] = -1;
+    
+    //after rotate
+    Matrix u = u0*mat_rotate;
+    Matrix v = v0*mat_rotate;
+    Matrix g = g0*mat_rotate;
+    
+    //middle coordinate of project image
+    Matrix e;
+    e.Init(1,3);
+    
+    
+    
+    
+    return result;
+}
+
 int main()
 {
    
 	Init();
-	Matrix a = get_rotate(3.1415926535897932384626,0,0);
-//	a.Show();
 
-/*	Matrix b;
-	b.Init(1,3);
-	b.pt[0][0] = 0;
-	b.pt[0][1] = 0;
-	b.pt[0][2] = -1;
-	double x,y,z;
-	while (1)
-	{
-		cin>>x>>y>>z;
-		(b*get_rotate(rate(x),rate(y),rate(z))).Show();
-	}
-*/
+    
     
     data_field.Load("./data");
     
-//    
-//    namedWindow( "Display window", WINDOW_AUTOSIZE );
-//    
-//    int current = 0;
-//    imshow( "Display window", data_field.data[current]->image);
-//    char in;
-//    while (1)
-//    {
-//        in = waitKey(0);
-//        if (in != -1)
-//            cout<<in<<endl;
-//        if (in == 'q')
-//            break;
-//        if (in == 'f')
-//        {
-//            current = (current+1)%data_field.num;
-//            cout<<"f    "<<current<<endl;
-//            namedWindow( "Display window", WINDOW_AUTOSIZE );
-//            imshow( "Display window", data_field.data[current]->image);                   // Show our image inside it.
-//        }
-//        if (in == 'b')
-//        {
-//            current = (current-1)%data_field.num;
-//            cout<<"b    "<<current<<endl;
-//            namedWindow( "Display window", WINDOW_AUTOSIZE );
-//            imshow( "Display window", data_field.data[current]->image);                   // Show our image inside it.
-//        }
-//    }
+    
+        namedWindow( "Display window", WINDOW_AUTOSIZE );
+
+    
+    
+    //Init veison direction
+    
+//    RayCast(0,rate(180),0,1500,512,300);
+    
     return 0;
 }

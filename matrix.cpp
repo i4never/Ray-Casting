@@ -3,7 +3,6 @@
 #include <iomanip>
 
 using namespace std;
-using namespace cv;
 
 /******************************/
 //class Matrix
@@ -34,20 +33,6 @@ void Matrix::Show()
 			cout<<setw(4)<<elmt[i][j];
 		cout<<endl;
 	}
-}
-
-Mat Matrix::Matrix2Image()
-{
-    image = Mat::Mat(r,c,CV_8UC4);
-    for (int i = 0; i < image.rows; ++i) {
-        for (int j = 0; j < image.cols; ++j) {
-            Vec4b& rgba = image.at<Vec4b>(i, j);
-            rgba[0] =(elmt[i][j]);
-            rgba[1] = saturate_cast<uchar>(elmt[i][j]);
-            rgba[2] = saturate_cast<uchar>(elmt[i][j]);
-        }
-    }
-    return image;
 }
 
 void Matrix::Init(int r,int c)

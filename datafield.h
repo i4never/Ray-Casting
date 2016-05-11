@@ -1,9 +1,9 @@
-#include <stdlib.h>
+#include "slice.h"
 
 class DataField
 {
 public:
-    Matrix ** data;
+    Slice ** slices;
     int num;
 public:
     DataField ();           //init
