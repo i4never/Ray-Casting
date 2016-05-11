@@ -72,6 +72,18 @@ Matrix Matrix::operator*(Matrix multi)
 	return result;
 }
 
+Matrix Matrix::operator*(ELEMENT_TYPE t)
+{
+    Matrix result;
+    result.Init(this->r,this->c);
+    for (int i = 0 ; i < this->r ; i++)
+        for (int j = 0 ; j < this->c ; j++)
+        {
+            result.elmt[i][j] = this->elmt[i][j]*t;
+        }
+    return result;
+}
+
 void Matrix::Reset()
 {
 	for (int i = 0 ; i < r ; i++)

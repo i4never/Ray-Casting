@@ -1,4 +1,4 @@
-typedef int ELEMENT_TYPE;
+typedef double ELEMENT_TYPE;
 
 class Matrix
 {
@@ -13,4 +13,5 @@ public:
 	void Reset();                           //clean the matrix
 	void Show();                            //pirnt matrix
 	Matrix operator*(Matrix multi);         //reload *
+    Matrix operator*(ELEMENT_TYPE t);         //reload *
 };
