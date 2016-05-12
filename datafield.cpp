@@ -74,15 +74,28 @@ bool DataField::Adjust()
     double offset = slices[middle_index]->coordinate[2];
     for (int i = 0 ; i < num ; i ++)
         slices[i]->coordinate[2] -= offset;
+    //x
+    limit[0][0] = slices[0]->coordinate[0];
+    limit[1][0] = slices[0]->coordinate[0]+pixel_space*(slices[0]->mat->r-1);
+    //y
+    limit[0][1] = slices[0]->coordinate[1];
+    limit[1][1] = slices[0]->coordinate[1]+pixel_space*(slices[1]->mat->r-1);
+    //z
+    limit[0][2] = slices[0]->coordinate[2];
+    limit[1][2] = slices[num-1]->coordinate[2];
     return true;
 }
 
 void DataField::Show()
 {
-    cout<<"show"<<num<<endl;
+    cout<<"Total:"<<num<<endl;
     for (int i = 0 ; i < num ; i++)
     {
         cout<<"Pictrure "<<num<<"   height:"<<slices[i]->mat->r<<"   width:"<<slices[i]->mat->c<<"   coordinate:";
         cout<<slices[i]->coordinate[0]<<"   "<<slices[i]->coordinate[1]<<"   "<<slices[i]->coordinate[2]<<"   "<<endl;
     }
+    cout<<"pixel spacing is:"<<pixel_space<<endl;
+    cout<<"x limit is from "<<limit[0][0]<<" to "<<limit[1][0]<<endl;
+    cout<<"y limit is from "<<limit[0][1]<<" to "<<limit[1][1]<<endl;
+    cout<<"z limit is from "<<limit[0][2]<<" to "<<limit[1][2]<<endl;
 }

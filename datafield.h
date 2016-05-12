@@ -6,6 +6,7 @@ public:
     Slice ** slices;
     int num;
     double pixel_space;
+    double limit[2][3];
 public:
     DataField ();           //init
     ~DataField();           //destory
