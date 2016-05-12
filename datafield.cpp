@@ -57,9 +57,32 @@ bool DataField::Load(const char * path)
 
 bool DataField::Adjust()
 {
+    //sort accroding to z-index
+    for (int i = 0 ; i < num-1 ; i++)
+        for (int j = i+1 ; j < num ; j++)
+        {
+            if (slices[i]->coordinate[2] > slices[j]->coordinate[2])
+            {
+                Slice * ptr = slices[i];
+                slices[i] = slices[j];
+                slices[j] = ptr;
+            }
+        }
+    
+    //move z-index
     int middle_index = num/2;
     double offset = slices[middle_index]->coordinate[2];
     for (int i = 0 ; i < num ; i ++)
         slices[i]->coordinate[2] -= offset;
     return true;
+}
+
+void DataField::Show()
+{
+    cout<<"show"<<num<<endl;
+    for (int i = 0 ; i < num ; i++)
+    {
+        cout<<"Pictrure "<<num<<"   height:"<<slices[i]->mat->r<<"   width:"<<slices[i]->mat->c<<"   coordinate:";
+        cout<<slices[i]->coordinate[0]<<"   "<<slices[i]->coordinate[1]<<"   "<<slices[i]->coordinate[2]<<"   "<<endl;
+    }
 }
