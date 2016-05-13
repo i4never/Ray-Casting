@@ -8,9 +8,10 @@ public:
     double pixel_space;
     double limit[2][3];
 public:
-    DataField ();           //init
-    ~DataField();           //destory
+    DataField ();                   //init
+    ~DataField();                   //destory
     bool Load(const char* path);    //load data
-    bool Adjust();          //sort accroding t z-index move z-index to make the datafiled's center location is near (0,0,0)
+    bool Adjust();                  //sort accroding t z-index move z-index to make the datafiled's center location is near (0,0,0)
+    bool Is_InField(Matrix coor);   //judge while a coordinate is in the datafield
     void Show();
 };

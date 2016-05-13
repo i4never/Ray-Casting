@@ -99,3 +99,14 @@ void DataField::Show()
     cout<<"y limit is from "<<limit[0][1]<<" to "<<limit[1][1]<<endl;
     cout<<"z limit is from "<<limit[0][2]<<" to "<<limit[1][2]<<endl;
 }
+
+bool DataField::Is_InField(Matrix coor)
+{
+    if (coor.elmt[0][0] < limit[0][0] || coor.elmt[0][0] > limit[1][0])
+        return false;
+    if (coor.elmt[0][1] < limit[0][1] || coor.elmt[0][1] > limit[1][2])
+        return false;
+    if (coor.elmt[0][2] < limit[0][2] || coor.elmt[0][2] > limit[1][2])
+        return false;
+    return true;
+}
