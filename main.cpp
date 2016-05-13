@@ -72,6 +72,58 @@ Matrix get_rotate(double ang_x, double ang_y, double ang_z)
 	return R;
 }
 
+//GetGrayValue
+//step: sample frequency
+double GetGrayValue(Matrix coor_init, Matrix g, int step)
+{
+    double alpha_in = 0;
+    double alpha = 0;
+    double alpha_out = 0;
+    double gray = 0;
+    Matrix coor;
+    coor.Init(1,3);
+    
+    char main_direction;
+    //judge the main dirction
+    if (fabs(g.elmt[0][0]) > fabs(g.elmt[0][1]) && fabs(g.elmt[0][0]) > fabs(g.elmt[0][2]))
+        main_direction = 'x';
+    if (fabs(g.elmt[0][1]) > fabs(g.elmt[0][0]) && fabs(g.elmt[0][1]) > fabs(g.elmt[0][2]))
+        main_direction = 'y';
+    if (fabs(g.elmt[0][2]) > fabs(g.elmt[0][0]) && fabs(g.elmt[0][2]) > fabs(g.elmt[0][1]))
+        main_direction = 'z';
+    
+    cout<<"main_direction: "<<main_direction<<endl;
+    
+    int i = 0;
+    while (true)
+    {
+        //calculate sample's coordinate
+        coor.elmt[0][0] = coor_init.elmt[0][0]+i*step*g.elmt[0][0];
+        coor.elmt[0][1] = coor_init.elmt[0][1]+i*step*g.elmt[0][1];
+        coor.elmt[0][2] = coor_init.elmt[0][2]+i*step*g.elmt[0][2];
+        cout<<"sample "<<i<<": "<<coor.elmt[0][0]<<"    "<<coor.elmt[0][1]<<"   "<<coor.elmt[0][2]<<endl;
+        i++;
+        //judge while the line is
+        if (data_field.Is_InField(coor))
+        {
+            //do the calculation
+        }
+        
+        //loop control, if the coordiante is already outrange in the main direction, stop loop
+        if (main_direction == 'x')
+            if ((g.elmt[0][0] > 0 && coor.elmt[0][0] > data_field.limit[1][0]) || (g.elmt[0][0] < 0 && coor.elmt[0][0] < data_field.limit[0][0]))
+                break;
+        if (main_direction == 'y')
+            if ((g.elmt[0][1] > 0 && coor.elmt[0][1] > data_field.limit[1][1]) || (g.elmt[0][1] < 0 && coor.elmt[0][1] < data_field.limit[0][1]))
+                break;
+        if (main_direction == 'z')
+            if ((g.elmt[0][2] > 0 && coor.elmt[0][2] > data_field.limit[1][2]) || (g.elmt[0][2] < 0 && coor.elmt[0][2] < data_field.limit[0][2]))
+                break;
+    }
+
+    return gray;
+}
+
 //Key function (the angle are using 0~2pi, all the length is mm)
 Matrix RayCast(double ang_x, double ang_y, double ang_z, double res_height, double res_width, double distance)
 {
@@ -98,13 +150,15 @@ Matrix RayCast(double ang_x, double ang_y, double ang_z, double res_height, doub
     //init view direction
     g0.Init(1,3);
     g0.elmt[0][0] = 0;
-    g0.elmt[0][1] = 0;
-    g0.elmt[0][2] = -1;
+    g0.elmt[0][1] = 1;
+    g0.elmt[0][2] = 0;
     
     //after rotate
     Matrix u = u0*mat_rotate;
     Matrix v = v0*mat_rotate;
     Matrix g = g0*mat_rotate;
+    cout<<"g:"<<endl;
+    g.Show();
     
     //center location of the project image
     Matrix s;
@@ -112,11 +166,13 @@ Matrix RayCast(double ang_x, double ang_y, double ang_z, double res_height, doub
     ZERO(s.elmt[0][0]);
     ZERO(s.elmt[0][1]);
     ZERO(s.elmt[0][2]);
+    cout<<"s:"<<endl;
     s.Show();
     
     //lower left location of the project image
     Matrix e;
     e = s-v*(res_height/2)-u*(res_width/2);
+    cout<<"e:"<<endl;
     e.Show();
     
     Matrix coor;
@@ -126,24 +182,20 @@ Matrix RayCast(double ang_x, double ang_y, double ang_z, double res_height, doub
     {
         for (int j = 0 ; j < res_width_pixel ; j++)
         {
-            //calculate the coordinate of this pixel
-//            coor.elmt[0] = e.elmt[0]+i*pixel_space*v[0]+j*pixel_space*u[0];
             coor = e+v*(i*data_field.pixel_space)+u*(j*data_field.pixel_space);
-            if (coor.elmt[0][0]*coor.elmt[0][1]<0)
-                result.elmt[i][j] = 255;
-            else
-                result.elmt[i][j] =0;
+//            result.elmt[i][j] = GetGrayValue();
         }
     }
-    coor.Show();
     
-    namedWindow( "Display window", WINDOW_AUTOSIZE );
+    GetGrayValue(coor,g,1);
     
-    Slice res;
-    res.mat = &result;
-    imshow( "Display window", res.Matrix2Image());
-    
-    waitKey(0);
+//    namedWindow( "Display window", WINDOW_NORMAL );
+//    
+//    Slice res;
+//    res.mat = &result;
+//    imshow( "Display window", res.Matrix2Image());
+//    
+//    waitKey(0);
     
     return result;
 }
@@ -156,8 +208,15 @@ int main()
     
     
     data_field.Load("./data");
-
-    RayCast(0,0,0,1400,400,-300);
+    data_field.Adjust();
+    data_field.Show();
+    
+    int height,width;
+    cout<<"please input height and width"<<endl;
+    cin>>height>>width;
+    
+    //弧度制，毫米
+    RayCast(0,0,0,height,width,-300);
     
     return 0;
 }
