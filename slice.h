@@ -15,4 +15,5 @@ public:
 	Slice();
 //    ~Matrix();
     Mat Matrix2Image();                     //matrix 2 image
+    void Z_Verse();                         //z verse
 };

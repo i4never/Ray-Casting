@@ -53,6 +53,56 @@ bool DataField::Load(const char * path)
     }
     fscanf(fp,"%lf", &pixel_space);
     cout<<"Finish loading "<<num<<" pictures, pixel spacing is "<<pixel_space<<"."<<endl;
+    Adjust();
+    return true;
+}
+
+bool DataField::LoadTestData()
+{
+    double d = 100;
+    z_step = 0.25;
+    num = 200/z_step+1;
+    pixel_space = 1;
+    slices = new Slice*[num];
+    int r,c;
+    r = c = 200;
+    for (int i = 0 ; i < num ; i++)
+    {
+        cout<<"slice "<<i<<endl;
+        slices[i] = new Slice;
+        slices[i]->mat = new Matrix;
+        slices[i]->coordinate[0] = -d;
+        slices[i]->coordinate[1] = -d;
+        double z;
+        z = slices[i]->coordinate[2] = -100+z_step*i;
+        slices[i]->mat->Init(r,c);
+        if  (slices[i]->coordinate[2] < 10 && slices[i]->coordinate[2] > -10)
+            continue;
+        for (int j = 0 ; j < r ; j++)
+            for (int k = 0 ; k < c ; k++)
+                if (((j-100)*(j-100)+(k-100)*(k-100)+z*z) > d*d)
+                    slices[i]->mat->elmt[j][k] = 0;
+                else
+//                    if (z < 0)
+//                        slices[i]->mat->elmt[j][k] = 100;
+//                    else
+//                        slices[i]->mat->elmt[j][k] = 200;
+//                    slices[i]->mat->elmt[j][k] = 255 - 255*((j-100)*(j-100)+(k-100)*(k-100)+z*z)/(d*d)
+                {
+                    if (((j-100)*(j-100)+(k-100)*(k-100)+z*z) < d*d && ((j-100)*(j-100)+(k-100)*(k-100)+z*z) > 90*90)
+                        slices[i]->mat->elmt[j][k] = 255;
+                    if (((j-100)*(j-100)+(k-100)*(k-100)+z*z) < 40*40)
+                        slices[i]->mat->elmt[j][k] = 100;
+                }
+    }
+    limit[0][0] = -100;
+    limit[0][1] = -100;
+    limit[0][2] = -100;
+    limit[1][0] = 99;
+    limit[1][1] = 99;
+    limit[1][2] = 100;
+    cout<<"Test data has been loaded"<<endl;
+    
     return true;
 }
 
@@ -95,7 +145,7 @@ void DataField::Show()
     cout<<"Total:"<<num<<endl;
     for (int i = 0 ; i < num ; i++)
     {
-        cout<<"Pictrure "<<num<<"   height:"<<slices[i]->mat->r<<"   width:"<<slices[i]->mat->c<<"   coordinate:";
+        cout<<"Pictrure "<<i<<"   height:"<<slices[i]->mat->r<<"   width:"<<slices[i]->mat->c<<"   coordinate:";
         cout<<slices[i]->coordinate[0]<<"   "<<slices[i]->coordinate[1]<<"   "<<slices[i]->coordinate[2]<<"   "<<endl;
     }
     cout<<"pixel spacing is: "<<pixel_space<<endl;
@@ -107,11 +157,11 @@ void DataField::Show()
 
 bool DataField::Is_InField(Matrix coor)
 {
-    if (coor.elmt[0][0] < limit[0][0] || coor.elmt[0][0] > limit[1][0])
+    if (coor.elmt[0][0] <= limit[0][0] || coor.elmt[0][0] >= limit[1][0])
         return false;
-    if (coor.elmt[0][1] < limit[0][1] || coor.elmt[0][1] > limit[1][2])
+    if (coor.elmt[0][1] <= limit[0][1] || coor.elmt[0][1] >= limit[1][2])
         return false;
-    if (coor.elmt[0][2] < limit[0][2] || coor.elmt[0][2] > limit[1][2])
+    if (coor.elmt[0][2] <= limit[0][2] || coor.elmt[0][2] >= limit[1][2])
         return false;
     return true;
 }
@@ -130,7 +180,7 @@ double DataField::GetValue(Matrix coor)
     y = int((coor.elmt[0][1] - limit[0][1])/pixel_space) + 1;
     z = int((coor.elmt[0][2]-limit[0][2])/z_step) + 1;
     
-//    cout<<"***** "<<x<<"    "<<y<<" "<<z<<endl;
+//    cout<<"linear inter "<<x<<"    "<<y<<" "<<z<<endl;
     value[0] = slices[z]->mat->elmt[x][y];
     value[1] = slices[z]->mat->elmt[x-1][y];
     value[2] = slices[z]->mat->elmt[x-1][y-1];
@@ -140,9 +190,9 @@ double DataField::GetValue(Matrix coor)
     value[6] = slices[z-1]->mat->elmt[x-1][y-1];
     value[7] = slices[z-1]->mat->elmt[x][y-1];
     
-    for (int i = 0 ; i < 8 ; i++)
-        cout<<value[i]<<"   ";
-    cout<<endl;
+//    for (int i = 0 ; i < 8 ; i++)
+//        cout<<value[i]<<"   ";
+//    cout<<endl;
 
     double prop_x, prop_y, prop_z;
     prop_x = (limit[0][0]+x*pixel_space-coor.elmt[0][0])/pixel_space;
@@ -161,7 +211,7 @@ double DataField::GetValue(Matrix coor)
     
     result = vf*(1-prop_x)+vb*prop_x;
 
-    cout<<"result:"<<result<<endl;
+//    cout<<"result:"<<result<<endl;
     
     
     return result;

@@ -16,4 +16,5 @@ public:
     bool Is_InField(Matrix coor);   //judge while a coordinate is in the datafield
     void Show();
     double GetValue(Matrix coor);   //interplotion
+    bool LoadTestData();            //load a ball
 };

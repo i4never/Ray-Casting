@@ -19,6 +19,9 @@ const double PI = 3.1415926535897932384626;
 DataField data_field;
 
 
+//for test
+bool DEBUG;
+
 
 //change int to string
 char * itoa(int num)
@@ -74,12 +77,13 @@ Matrix get_rotate(double ang_x, double ang_y, double ang_z)
 
 //GetGrayValue
 //step: sample frequency
-double GetGrayValue(Matrix coor_init, Matrix g, int step)
+double GetGrayValue(Matrix coor_init, Matrix g, double step)
 {
     double alpha_in = 0;
     double alpha = 0;
     double alpha_out = 0;
     double gray = 0;
+    double gray_out = 0;
     Matrix coor;
     coor.Init(1,3);
     
@@ -92,7 +96,7 @@ double GetGrayValue(Matrix coor_init, Matrix g, int step)
     if (fabs(g.elmt[0][2]) > fabs(g.elmt[0][0]) && fabs(g.elmt[0][2]) > fabs(g.elmt[0][1]))
         main_direction = 'z';
     
-    cout<<"main_direction: "<<main_direction<<endl;
+//    cout<<"main_direction: "<<main_direction<<endl;
     
     int i = 0;
     while (true)
@@ -101,13 +105,10 @@ double GetGrayValue(Matrix coor_init, Matrix g, int step)
         coor.elmt[0][0] = coor_init.elmt[0][0]+i*step*g.elmt[0][0];
         coor.elmt[0][1] = coor_init.elmt[0][1]+i*step*g.elmt[0][1];
         coor.elmt[0][2] = coor_init.elmt[0][2]+i*step*g.elmt[0][2];
-        cout<<"sample "<<i<<": "<<coor.elmt[0][0]<<"    "<<coor.elmt[0][1]<<"   "<<coor.elmt[0][2]<<endl;
+//        cout<<"sample "<<i<<": "<<coor.elmt[0][0]<<"    "<<coor.elmt[0][1]<<"   "<<coor.elmt[0][2]<<endl;
         i++;
-        //judge while the line is
-        if (data_field.Is_InField(coor))
-        {
-            //do the calculation
-        }
+        
+        //GetSampleValue
         
         //loop control, if the coordiante is already outrange in the main direction, stop loop
         if (main_direction == 'x')
@@ -119,9 +120,77 @@ double GetGrayValue(Matrix coor_init, Matrix g, int step)
         if (main_direction == 'z')
             if ((g.elmt[0][2] > 0 && coor.elmt[0][2] > data_field.limit[1][2]) || (g.elmt[0][2] < 0 && coor.elmt[0][2] < data_field.limit[0][2]))
                 break;
+        
+        
+        
+        //judge while the pixel is in the datafield
+        if (!data_field.Is_InField(coor))
+            continue;
+        
+//        cout<<"sample "<<i<<": "<<coor.elmt[0][0]<<"    "<<coor.elmt[0][1]<<"   "<<coor.elmt[0][2]<<"   ";
+        
+        
+        gray = data_field.GetValue(coor);
+//        cout<<"in field,gray: "<<gray<<endl;
+//        getchar();
+//        //**************this is for test
+//        if (gray)
+//            return gray;
+//        //**************this is for test
+
+        
+        //judge alpha according to the gray value
+        //background
+//        if (gray < 100)
+//            continue;
+        //else, linera relationship
+
+//        if (gray < 107 || gray > 150)
+//            continue;
+        
+//        alpha = (2*gray)/(double)215-(double)128/(double)215;
+//        alpha = gray/(double)255;
+        
+//        if (gray != 255 && gray != 100)
+//            continue;
+//        if (gray == 255)
+//            alpha = 0.1;
+//        if (gray == 100)
+//            alpha = 0.9;
+//        if (gray == 50)
+//            alpha = 0;
+        
+        
+        //data lung bone
+//        if (gray < 230)
+//            continue;
+//        alpha = (gray*9)/(double)1050-(double)83/(double)70;
+
+        
+        if (gray == 0)
+            continue;
+        alpha = -gray/(double)255+1;
+
+        
+        
+//
+//        
+//        if (gray < 150)
+//        {
+//            continue;
+//        }
+        
+        alpha_out = alpha_in + (1-alpha_in)*alpha;
+
+        
+        
+        gray_out = (gray_out*alpha_in + gray*alpha*(1-alpha_in))/alpha_out;
+//        cout<<"gray: "<<gray<<" alpha: "<<alpha<<" alpha out: "<<alpha_out<<" alpha in: "<<alpha_in<<" gray out: "<<gray_out<<endl;
+        alpha_in =alpha_out;
+
     }
 
-    return gray;
+    return gray_out;
 }
 
 //Key function (the angle are using 0~2pi, all the length is mm)
@@ -139,18 +208,18 @@ Matrix RayCast(double ang_x, double ang_y, double ang_z, double res_height, doub
     Matrix mat_rotate = get_rotate(ang_x, ang_y, ang_z);
     //init horizon direction
     u0.Init(1,3);
-    u0.elmt[0][0] = 1;
-    u0.elmt[0][1] = 0;
+    u0.elmt[0][0] = 0;
+    u0.elmt[0][1] = 1;
     u0.elmt[0][2] = 0;
     //init vertical direction
     v0.Init(1,3);
     v0.elmt[0][0] = 0;
-    v0.elmt[0][1] = 1;
-    v0.elmt[0][2] = 0;
+    v0.elmt[0][1] = 0;
+    v0.elmt[0][2] = 1;
     //init view direction
     g0.Init(1,3);
-    g0.elmt[0][0] = 0;
-    g0.elmt[0][1] = 1;
+    g0.elmt[0][0] = -1;
+    g0.elmt[0][1] = 0;
     g0.elmt[0][2] = 0;
     
     //after rotate
@@ -175,48 +244,98 @@ Matrix RayCast(double ang_x, double ang_y, double ang_z, double res_height, doub
     cout<<"e:"<<endl;
     e.Show();
     
+    
     Matrix coor;
     coor.Init(1,3);
+    
+    
+    
+    //*****test
+//    while(true){
+//        cin>>coor.elmt[0][0]>>coor.elmt[0][1]>>coor.elmt[0][2];
+//        cout<<GetGrayValue(coor,g,data_field.pixel_space)<<endl;;
+//    }
+//
+    
     //calculate each pixel
+    int time = 0;
     for (int i = 0 ; i < res_height_pixel ; i++)
     {
         for (int j = 0 ; j < res_width_pixel ; j++)
         {
             coor = e+v*(i*data_field.pixel_space)+u*(j*data_field.pixel_space);
+//            cout<<"******   "<<i<<" "<<j<<" "<<endl;
+//            coor.Show();
 //            result.elmt[i][j] = GetGrayValue();
+            result.elmt[i][j] = GetGrayValue(coor,g,2);
+//            cout<<"value: "<<result.elmt[i][j]<<endl;
+//            getchar();
         }
+//        getchar();
     }
     
-    GetGrayValue(coor,g,1);
     
-//    namedWindow( "Display window", WINDOW_NORMAL );
-//    
-//    Slice res;
-//    res.mat = &result;
-//    imshow( "Display window", res.Matrix2Image());
-//    
-//    waitKey(0);
+    namedWindow( "Display window", WINDOW_NORMAL );
+    
+    Slice res;
+    res.mat = &result;
+//    res.Z_Verse();
+    imshow( "Display window", res.Matrix2Image());
+    
+    waitKey(0);
     
     return result;
 }
 
 int main()
 {
-   
-	Init();
+    double a = 0;
+    double b = 0;
+    cout<<a*b<<endl;
+    Init();
 
     
     
     data_field.Load("./data");
     data_field.Adjust();
+//    data_field.LoadTestData();
     data_field.Show();
+
     
-    int height,width;
-    cout<<"please input height and width"<<endl;
-    cin>>height>>width;
     
-    //弧度制，毫米
-    RayCast(0,0,0,height,width,-300);
+//    
+//    int current = 0;
+//    namedWindow( "Display window", WINDOW_NORMAL );
+//    imshow( "Display window", data_field.slices[current]->Matrix2Image());
+//    
+//    
+//    
+//
+//    char c;
+//    while(1)
+//    {
+//        c = waitKey(0);
+//        cout<<c<<endl;
+//        if (c == 'f')
+//            current++;
+//        if (c == 'b')
+//            current--;
+//        cout<<"current: "<<current<<endl;
+//        imshow( "Display window", data_field.slices[current]->Matrix2Image());
+//    }
+    
+   
+//    while (true){
+        int height,width,distance;
+        cout<<"please input height , width , distance"<<endl;
+        cin>>height>>width>>distance;
+        cout<<"please input angel x, y, z"<<endl;
+        double ang_x,ang_y,ang_z;
+        cin>>ang_x>>ang_y>>ang_z;
+    
+        //弧度制，毫米
+        RayCast(rate(ang_x),rate(ang_y),rate(ang_z),height,width,distance);
+//    }
     
     return 0;
 }

@@ -24,3 +24,13 @@ Mat Slice::Matrix2Image()
     }
     return image;
 }
+
+void Slice::Z_Verse()
+{
+    Matrix result;
+    result.Init(mat->r,mat->c);
+    for (int i = 0 ; i < mat->r ; i++)
+        for (int j = 0 ; j < mat->c ; j++)
+            result.elmt[i][j] = mat->elmt[mat->r-1-i][mat->c-1-j];
+    mat = &result;
+}
