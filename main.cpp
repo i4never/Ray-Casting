@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <iostream>
+#include <time.h>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/opencv.hpp>
@@ -130,7 +131,10 @@ double GetGrayValue(Matrix coor_init, Matrix g, double step)
 //        cout<<"sample "<<i<<": "<<coor.elmt[0][0]<<"    "<<coor.elmt[0][1]<<"   "<<coor.elmt[0][2]<<"   ";
         
         
-        gray = data_field.GetValue(coor);
+//        gray = data_field.Linear_GetValue(coor);
+        gray = data_field.IDW_GetValue(coor);
+        
+        
 //        cout<<"in field,gray: "<<gray<<endl;
 //        getchar();
 //        //**************this is for test
@@ -165,11 +169,19 @@ double GetGrayValue(Matrix coor_init, Matrix g, double step)
 //        if (gray < 230)
 //            continue;
 //        alpha = (gray*9)/(double)1050-(double)83/(double)70;
+        
+        if (gray<100)
+            continue;
+            alpha = 0.6;
 
         
-        if (gray == 0)
-            continue;
-        alpha = -gray/(double)255+1;
+//        if (gray < 220)
+//            continue;
+//        alpha = gray/(double)1275+0.6;
+//        alpha = -gray/(double)1275+0.8;
+//        alpha = gray*4/(double)350-(double)67/(double)35;
+//        alpha = 1;
+//        alpha = 0.8;
 
         
         
@@ -267,7 +279,7 @@ Matrix RayCast(double ang_x, double ang_y, double ang_z, double res_height, doub
 //            cout<<"******   "<<i<<" "<<j<<" "<<endl;
 //            coor.Show();
 //            result.elmt[i][j] = GetGrayValue();
-            result.elmt[i][j] = GetGrayValue(coor,g,2);
+            result.elmt[i][j] = GetGrayValue(coor,g,data_field.pixel_space);
 //            cout<<"value: "<<result.elmt[i][j]<<endl;
 //            getchar();
         }
@@ -287,23 +299,19 @@ Matrix RayCast(double ang_x, double ang_y, double ang_z, double res_height, doub
     return result;
 }
 
-int main()
+int main(int argc, char**argv)
 {
-    double a = 0;
-    double b = 0;
-    cout<<a*b<<endl;
     Init();
-
     
-    
-    data_field.Load("./data");
+    data_field.Load(argv[1]);
     data_field.Adjust();
 //    data_field.LoadTestData();
     data_field.Show();
 
+//    data_field.IDW(2);
     
-    
-//    
+//    data_field.Show();
+//
 //    int current = 0;
 //    namedWindow( "Display window", WINDOW_NORMAL );
 //    imshow( "Display window", data_field.slices[current]->Matrix2Image());
@@ -323,7 +331,7 @@ int main()
 //        cout<<"current: "<<current<<endl;
 //        imshow( "Display window", data_field.slices[current]->Matrix2Image());
 //    }
-    
+//
    
 //    while (true){
         int height,width,distance;
@@ -334,7 +342,13 @@ int main()
         cin>>ang_x>>ang_y>>ang_z;
     
         //弧度制，毫米
+        clock_t start,finish;
+        double totaltime;
+        start=clock();
         RayCast(rate(ang_x),rate(ang_y),rate(ang_z),height,width,distance);
+        finish=clock();
+        totaltime=(double)(finish-start)/CLOCKS_PER_SEC;
+        cout<<"Time consumed: "<<totaltime<<"s"<<endl;
 //    }
     
     return 0;
