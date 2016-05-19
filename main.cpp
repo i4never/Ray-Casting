@@ -165,14 +165,14 @@ double GetGrayValue(Matrix coor_init, Matrix g, double step)
 //            alpha = 0;
         
         
-        //data lung bone
-//        if (gray < 230)
-//            continue;
-//        alpha = (gray*9)/(double)1050-(double)83/(double)70;
-        
-        if (gray<100)
+//        data lung bone
+        if (gray < 230)
             continue;
-            alpha = 0.6;
+        alpha = (gray*9)/(double)1050-(double)83/(double)70;
+        
+//        if (gray<100)
+//            continue;
+//            alpha = 0.9;
 
         
 //        if (gray < 220)
